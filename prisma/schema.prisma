@@ -1,0 +1,58 @@
+// kon database er sathe connect hobo
+
+datasource db {
+    provider = "mysql"
+    url = env("DATABASE_URL")
+}
+
+// kon client er maddhome kaj korbo
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+// create model
+model User {
+  id            Int @id @default(autoincrement())
+  name          String
+  email         String @unique
+  age           Int?
+  posts         CategoriesOnPosts[] // Relation to CategoriesOnPosts
+  status        Boolean @default(true)
+  trash         Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Posts {
+  id            Int @id @default(autoincrement())
+  title         String
+  desc          String
+  categories    CategoriesOnPosts[] // Relation to CategoriesOnPosts
+  status        Boolean @default(true)
+  trash         Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Categories {
+  id            Int @id @default(autoincrement())
+  name          String
+  posts         CategoriesOnPosts[] // Relation to CategoriesOnPosts
+  status        Boolean @default(true)
+  trash         Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CategoriesOnPosts {
+  post            Posts @relation(fields: [postId], references: [id])
+  postId          Int
+  category        Categories @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  assignedAt      DateTime @default(now())
+  assignedBy      User @relation(fields: [assignedById], references: [id])
+  assignedById    Int
+
+  @@id([postId, categoryId])
+}
